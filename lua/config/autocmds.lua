@@ -7,60 +7,51 @@
 -- Or remove existing autocmds by their group name (which is prefixed with `lazyvim_` for the defaults)
 -- e.g. vim.api.nvim_del_augroup_by_name("lazyvim_wrap_spell")
 
--- 高亮 yank 的文本
-vim.api.nvim_create_autocmd("TextYankPost", {
-  desc = "Highlight when yanking text",
-  group = vim.api.nvim_create_augroup("highlight-yank", { clear = true }),
-  callback = function()
-    vim.highlight.on_yank()
-  end,
-})
+-- NOTE: The following are handled by LazyVim defaults and should NOT be repeated:
+--   - TextYankPost (highlight yank)
+--   - BufReadPost (restore cursor position)
+--   - Auto-formatting (handled by conform.nvim via LazyVim)
 
--- 自动调整窗口大小（Termux 小屏幕优化）
+-- =========================================================
+-- Termux: 自动调整窗口大小
+-- =========================================================
 if os.getenv("TERMUX_VERSION") ~= nil then
   vim.api.nvim_create_autocmd("VimResized", {
     desc = "Auto resize windows on Termux",
+    group = vim.api.nvim_create_augroup("termux_resize", { clear = true }),
     callback = function()
       vim.cmd("wincmd =")
     end,
   })
 end
 
--- 创建目录（如果不存在）
+-- =========================================================
+-- 创建父目录（如果不存在）
+-- =========================================================
 vim.api.nvim_create_autocmd("BufWritePre", {
   desc = "Create parent directories on save",
-  group = vim.api.nvim_create_augroup("create-parent-dir", { clear = true }),
+  group = vim.api.nvim_create_augroup("create_parent_dir", { clear = true }),
   callback = function(event)
-    local file = vim.loop.fs_realpath(event.match) or event.match
+    if event.match:match("^%w%w+:[\\/][\\/]") then
+      return -- skip URLs (oil://, fugitive://, etc.)
+    end
+    local file = vim.uv.fs_realpath(event.match) or event.match
     vim.fn.mkdir(vim.fn.fnamemodify(file, ":p:h"), "p")
   end,
 })
 
--- 恢复光标位置
-vim.api.nvim_create_autocmd("BufReadPost", {
-  desc = "Restore cursor position",
-  group = vim.api.nvim_create_augroup("restore-cursor", { clear = true }),
-  callback = function(event)
-    local exclude = { "gitcommit" }
-    local buf = event.buf
-    if vim.tbl_contains(exclude, vim.bo[buf].filetype) then
-      return
-    end
-    local mark = vim.api.nvim_buf_get_mark(buf, '"')
-    local lcount = vim.api.nvim_buf_line_count(buf)
-    if mark[1] > 0 and mark[1] <= lcount then
-      pcall(vim.api.nvim_win_set_cursor, 0, mark)
-    end
-  end,
-})
-
--- 压缩空行
+-- =========================================================
+-- 压缩尾部空白和空行
+-- =========================================================
 vim.api.nvim_create_autocmd("BufWritePre", {
   desc = "Trim trailing whitespace and empty lines at end of file",
-  group = vim.api.nvim_create_augroup("trim-whitespace", { clear = true }),
+  group = vim.api.nvim_create_augroup("trim_whitespace", { clear = true }),
   callback = function(event)
-    local file = event.match
-    if file:match("^/tmp/") then
+    if event.match:match("^/tmp/") then
+      return
+    end
+    -- Skip if formatting is disabled
+    if vim.g.autoformat == false or vim.b[event.buf].autoformat == false then
       return
     end
     local save = vim.fn.winsaveview()
@@ -70,17 +61,20 @@ vim.api.nvim_create_autocmd("BufWritePre", {
   end,
 })
 
--- 自动格式化（如果配置了 formatter）
-vim.api.nvim_create_autocmd("BufWritePre", {
-  desc = "Auto format on save",
-  group = vim.api.nvim_create_augroup("auto-format", { clear = true }),
+-- =========================================================
+-- 大文件优化：自动禁用耗性能的功能
+-- =========================================================
+vim.api.nvim_create_autocmd("BufReadPre", {
+  desc = "Disable heavy features for large files",
+  group = vim.api.nvim_create_augroup("bigfile_perf", { clear = true }),
   callback = function(event)
-    if vim.g.autoformat == false then
-      return
-    end
-    local buf = event.buf
-    if vim.lsp.get_clients({ bufnr = buf })[1] then
-      vim.lsp.buf.format({ bufnr = buf })
+    local max_filesize = 1024 * 1024 -- 1 MB
+    local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(event.buf))
+    if ok and stats and stats.size > max_filesize then
+      vim.b[event.buf].minicursorword_disable = true
+      vim.cmd("syntax clear")
+      vim.opt_local.foldmethod = "manual"
+      vim.opt_local.spell = false
     end
   end,
 })
