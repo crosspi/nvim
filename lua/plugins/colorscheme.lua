@@ -14,7 +14,6 @@ return {
   -- catppuccin 透明背景 (如果有使用)
   {
     "catppuccin/nvim",
-    name = "catppuccin",
     opts = {
       transparent_background = true,
     },

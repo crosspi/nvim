@@ -1,6 +1,6 @@
 return {
   "mistweaverco/kulala.nvim",
-  -- 只有在打开 http/rest 文件时才会加载这些快捷键
+  ft = { "http", "rest" },
   keys = {
     {
       "<leader>Rs",

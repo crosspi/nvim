@@ -7,16 +7,7 @@ local is_termux = os.getenv("TERMUX_VERSION") ~= nil
 -- =========================================================
 -- 通用选项 (All Platforms)
 -- =========================================================
-vim.opt.undofile = true -- 持久化 undo 历史
-vim.opt.undolevels = 10000 -- 更多 undo 步数
 vim.opt.smoothscroll = true -- 平滑滚动 (Neovim 0.10+)
-vim.opt.splitkeep = "screen" -- 分割窗口时保持屏幕内容不跳动
-vim.opt.virtualedit = "block" -- 可视块模式下允许光标超出行尾
-vim.opt.jumpoptions = "view" -- 跳转时保持视角
-vim.opt.confirm = true -- 退出未保存文件时弹出确认
-vim.opt.grepprg = "rg --vimgrep" -- 使用 ripgrep 替代 grep
-vim.opt.grepformat = "%f:%l:%c:%m" -- ripgrep 输出格式
-vim.opt.formatexpr = "v:lua.require'lazyvim.util'.format.formatexpr()"
 
 -- =========================================================
 -- Termux 移动端优化
@@ -68,8 +59,6 @@ if is_termux then
 -- 桌面端设置 (NixOS / Neovide / WSL)
 -- =========================================================
 else
-  vim.opt.clipboard = { "unnamed", "unnamedplus" }
-
   -- Neovide GUI 设置
   if vim.g.neovide then
     vim.o.guifont = "Maple Mono Normal NF CN:h14"

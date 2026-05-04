@@ -7,7 +7,7 @@ local map = vim.keymap.set
 -- =========================================================
 -- 窗口 & 终端
 -- =========================================================
-map({ "n", "t" }, "<C-\\>", function()
+map("n", "<C-\\>", function()
   Snacks.terminal.toggle(nil, {
     win = {
       position = "float",
@@ -47,7 +47,7 @@ map("n", "J", "mzJ`z", { desc = "Join line (keep cursor)" })
 map("x", "<leader>p", [["_dP]], { desc = "Paste without overwrite register" })
 
 -- 删除时不影响寄存器
-map({ "n", "v" }, "<leader>d", [["_d]], { desc = "Delete without register" })
+map({ "n", "v" }, "<leader>D", [["_d]], { desc = "Delete without register" })
 
 -- =========================================================
 -- 快速操作

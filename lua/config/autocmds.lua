@@ -47,7 +47,8 @@ vim.api.nvim_create_autocmd("BufWritePre", {
   desc = "Trim trailing whitespace and empty lines at end of file",
   group = vim.api.nvim_create_augroup("trim_whitespace", { clear = true }),
   callback = function(event)
-    if event.match:match("^/tmp/") then
+    local bt = vim.bo[event.buf].buftype
+    if bt == "nofile" or bt == "acwrite" or bt == "help" then
       return
     end
     -- Skip if formatting is disabled
@@ -71,7 +72,7 @@ vim.api.nvim_create_autocmd("BufReadPre", {
     local max_filesize = 1024 * 1024 -- 1 MB
     local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(event.buf))
     if ok and stats and stats.size > max_filesize then
-      vim.b[event.buf].minicursorword_disable = true
+      vim.b[event.buf].snacks_words = false
       vim.cmd("syntax clear")
       vim.opt_local.foldmethod = "manual"
       vim.opt_local.spell = false

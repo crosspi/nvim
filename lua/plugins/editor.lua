@@ -1,13 +1,5 @@
 -- Editor enhancement plugins
 return {
-  -- =========================================================
-  -- 更好的 surround 操作 (已包含在 LazyVim 默认配置中)
-  -- =========================================================
-
-  -- =========================================================
-  -- todo-comments: 高亮 TODO/FIXME/HACK 等注释
-  -- (已包含在 LazyVim 默认配置中，这里仅覆盖配置)
-  -- =========================================================
   {
     "folke/todo-comments.nvim",
     opts = {
@@ -23,7 +15,7 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     opts = function(_, opts)
-      vim.list_extend(opts.ensure_installed or {}, {
+      opts.ensure_installed = vim.list_extend(opts.ensure_installed or {}, {
         "bash",
         "fish",
         "html",
