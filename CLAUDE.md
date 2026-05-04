@@ -47,8 +47,7 @@ Enabled in `lazyvim.json`: Rust, JSON, TOML, Nix, Markdown, and mini.files. Thes
 
 ## Key custom plugins
 
-- **opencode.nvim** — AI coding assistant (keybinds: `<C-a>` ask, `<C-x>` execute, `<C-.>` toggle, `go` operator)
-- **gemini.nvim + mcp.nvim** — Gemini CLI integration with MCP protocol
+- **claudecode.nvim** — Claude Code integration via WebSocket MCP (keybinds: `<leader>ac` toggle, `<leader>af` focus, `<leader>ar` resume, `<leader>aa`/`ad` accept/reject diffs)
 - **kulala.nvim** — HTTP client for `.http`/`.rest` files (keybinds: `<leader>Rs`/`Ra`/`Rb`, `[R`/`]R`)
 - **colorscheme** — tokyonight (moon, transparent) and catppuccin (transparent)
 - **treesitter** — extended `ensure_installed` list
