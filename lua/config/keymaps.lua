@@ -7,7 +7,7 @@ local map = vim.keymap.set
 -- =========================================================
 -- 窗口 & 终端
 -- =========================================================
-map("n", "<C-\\>", function()
+map({ "n", "t" }, "<C-\\>", function()
   Snacks.terminal.toggle(nil, {
     win = {
       position = "float",
